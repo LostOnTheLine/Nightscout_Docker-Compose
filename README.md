@@ -27,7 +27,7 @@ For an easy setup [JC21 has a nice Docker Container](https://hub.docker.com/r/jc
 ```
 
 
-## Easy docker-compose
+## Easy docker-compose for xDrip
 
 ```yaml
 
@@ -35,15 +35,7 @@ For an easy setup [JC21 has a nice Docker Container](https://hub.docker.com/r/jc
 ```
 
 
-## xDrip docker-compose
-
-```yaml
-
-
-```
-
-
-## Dexcom docker-compose
+## Easy docker-compose for Dexcom
 
 ```yaml
 

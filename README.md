@@ -16,10 +16,10 @@ I personally use [NginX Proxy Manager](https://hub.docker.com/r/jc21/nginx-proxy
 5. I'm sure a few other conditions
 
 But I feel that is a separate issue & including that makes it harder to work with not easier.
-For an easy setup [JC21 has a nice Docker Container](https://hub.docker.com/r/jc21/nginx-proxy-manager). Unfortunately the [instructions](https://nginxproxymanager.com/setup/#running-the-app) are not great & not included directly on DockerHub, but there are loads of YouTube Guides on it, but it's nice & doesn't require complicated setup or a separate database, plus it doesn't require settings in the docker-compose for each thing, everything to be on the same shared docker network, or elevated privileges, & has a Graphical interface your Grandma could use.
+For an easy setup [JC21 has a nice Docker Container](https://hub.docker.com/r/jc21/nginx-proxy-manager). Unfortunately the [instructions](https://nginxproxymanager.com/setup/#running-the-app) are not great & not included directly on DockerHub, but there are loads of YouTube Guides on it, but it's nice & doesn't require complicated setup or a separate database, plus it doesn't require settings in the docker-compose for each thing, everything to be on the same shared docker network, or elevated privileges, & has a **G**raphical **U**ser **I**nterface your Grandma could use.
 
 
-## Easy docker-compose
+## Complete docker-compose
 
 ```yaml
 
@@ -27,7 +27,7 @@ For an easy setup [JC21 has a nice Docker Container](https://hub.docker.com/r/jc
 ```
 
 
-## Complete docker-compose
+## Easy docker-compose
 
 ```yaml
 

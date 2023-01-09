@@ -6,10 +6,28 @@ My intent is to include all the possible values you may want while giving enough
 You can delete any lines you do not need, as I feel it much easier to delete what you don't need than it is to go searching for what you do, especially since nowhere seems to contain it all & formatting is never clearly stated anywhere
 
 
-Basic `docker-compose`
+## Basic docker-compose
 
 ```yaml
 services:
-  test:
-    - yes
+
 ```
+
+
+## xDrip docker-compose
+
+```yaml
+services:
+
+```
+
+
+## Dexcom docker-compose
+
+```yaml
+services:
+
+```
+
+
+

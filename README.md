@@ -190,7 +190,7 @@ services:
       #- /docker/cgm/nightscout/audio/alarm.ogg:/opt/app/static/audio/alarm.ogg             # As far as I know these are never used
       #- /docker/cgm/nightscout/audio/urgent.mp3:/opt/app/static/audio/alarm2.mp3
       #- /docker/cgm/nightscout/audio/alarm2.ogg:/opt/app/static/audio/alarm2.ogg           # As far as I know these are never used
-      - /docker/cgm/nightscout/audio:/opt/app/static/audio
+    #  - /docker/cgm/nightscout/audio:/opt/app/static/audio
       - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-mongodb}
       - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-mongodb}
     restart: always                                             # Refer to {nightscout-mongodb}
@@ -315,7 +315,7 @@ services:
     ports:
       - "1337:1337"
     volumes:
-      - /docker/cgm/nightscout/audio:/opt/app/static/audio
+      #- /docker/cgm/nightscout/audio:/opt/app/static/audio
       - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-mongodb}
       - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-mongodb}
     restart: always                                             # Refer to {nightscout-mongodb}
@@ -402,7 +402,7 @@ services:
       - EDIT_MODE=off                                           # do not allow treatment editing
       #- AUTH_DEFAULT_ROLES=                                     # DEFAULT[readable] - CHOICES: "readable" | "denied" | <<Or any valid role name>>
     ############
-      - ENABLE="careport basal bridge" # enable optional features, expects {space delimited list} https://github.com/nightscout/cgm-remote-monitor#plugins
+      - ENABLE="careport basal bridge"                          # enable optional features, expects {space delimited list} https://github.com/nightscout/cgm-remote-monitor#plugins
     ############
              # "timeago" (Time Ago) Settings
       #- TIMEAGO_ENABLE_ALERTS=                                  # DEFAULT[false] - CHOICES: true | false - (true)= enable stale data alarms via Pushover & IFTTT

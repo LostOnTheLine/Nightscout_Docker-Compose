@@ -150,9 +150,6 @@ services:
       #- PROFILE_MULTIPLE=                                       # DEFAULT[off] - CHOICES: on | off - Enable/disable NS ability to handle & switch between multiple treatment profiles
     ############
     ############
-      - 
-    ############
-    ############
             # xDrip
       #- API_SECRET=secretAPIatLeast12Characters                 # In xDrip got {Settings} > {Cloud Upload} > {Nightscout Sync (REST-API)}
       #- BASE_URL=https://me.xdrip.ext                           # {Enabled}=ON, {Base URL}= "<<API_SECRET>>@<<BASE_URL>>/api/v1/"

@@ -106,16 +106,16 @@ services:
     ############
       - ALARM_TYPES="simple predict"                            # DEFAULT[simple] - CHOICES: "simple" | "predict" | ""simple predict""
              # "simplealarms" (Simple BG Alarms) Settings
-      - BG_HIGH=180                                             # DEFAULT[260] - CHOICES: 40-400  - Triggers the ALARM_URGENT_HIGH alarm
+      - BG_HIGH=260                                             # DEFAULT[260] - CHOICES: 40-400  - Triggers the ALARM_URGENT_HIGH alarm
       - ALARM_URGENT_HIGH=on                                    # DEFAULT[on] - CHOICES: on | off - 
       #- ALARM_URGENT_HIGH_MINS=                                     # DEFAULT["30 60 90 120"] - Number of minutes to snooze urgent high alarms
-      - BG_TARGET_TOP=170                                       # DEFAULT[180] - CHOICES: 40-400  - Triggers the ALARM_HIGH alarm
+      - BG_TARGET_TOP=180                                       # DEFAULT[180] - CHOICES: 40-400  - Triggers the ALARM_HIGH alarm
       - ALARM_HIGH=on                                           # DEFAULT[on] - CHOICES: on | off - 
       #- ALARM_HIGH_MINS=                                            # DEFAULT["30 60 90 120"] - Number of minutes to snooze high alarms
-      - BG_TARGET_BOTTOM=55                                     # DEFAULT[80] - CHOICES: 40-400   - Triggers the ALARM_LOW alarm
+      - BG_TARGET_BOTTOM=80                                     # DEFAULT[80] - CHOICES: 40-400   - Triggers the ALARM_LOW alarm
       - ALARM_LOW=on                                            # DEFAULT[on] - CHOICES: on | off - 
       #- ALARM_LOW_MINS=                                             # DEFAULT["15 30 45 60"] - Number of minutes to snooze low alarms
-      - BG_LOW=50                                               # DEFAULT[55] - CHOICES: 40-400   - Triggers the ALARM_URGENT_LOW alarm
+      - BG_LOW=55                                               # DEFAULT[55] - CHOICES: 40-400   - Triggers the ALARM_URGENT_LOW alarm
       - ALARM_URGENT_LOW=on                                     # DEFAULT[on] - CHOICES: on | off - 
       #- ALARM_URGENT_LOW_MINS=                                  # DEFAULT["15 30 45"] - Number of minutes to snooze urgent low alarms
       #- ALARM_URGENT_MIN=                                       # DEFAULT["30 60 90 120"] - Number of minutes to snooze urgent alarms (that aren't tagged as high or low)

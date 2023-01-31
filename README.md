@@ -11,7 +11,7 @@ You can delete any lines you do not need, as I feel it much easier to delete wha
 I personally use [NginX Proxy Manager](https://hub.docker.com/r/jc21/nginx-proxy-manager), a simple, easy GUI to manage things shared externally. I have not included *any* details about setting up a Reverse Proxy, you will have to cover that on your own. Any tutorial on how to do that will work fine. Most Docker-Compose files for Nightscout I have found have included an instance of `Traefik` to do this, which *should* work fine so long as
 1. You don't already have a proxy manager
 2. Your router uses UPnP
-3. Your server/host/computer/network doesn't already any internal traffic on your web ports (80 & 443)
+3. Your server/host/computer/network doesn't already have any internal traffic on your web ports (80 & 443)
 4. You're not behind a double-NAT
 5. I'm sure a few other conditions
 

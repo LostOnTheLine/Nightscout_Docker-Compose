@@ -29,59 +29,15 @@ version: '3.9'
 ####    All comments (Things after "# ") or unwanted lines can be removed
 ####    "/docker/cgm/nightscout/" is used in this example as the local install location. locations can be changed to suit your setup
 services:
-  nightscout-mongodb:                                   # SERVICE_NAME - used by the "depends_on:" to make sure the database it running before things try to use it
-    image: bitnami/mongodb:latest                       # Other options "image: mongo:latest" will need adjustments in other places such as "volumes:" mounts
-    #image: docker.io/bitnami/mongodb:4.4                # I prefer to call "latest" & without "docker.io/" But others prefer to use them for stability assurance
-    container_name: nightscout-mongodb                  # called in Nightscout's MONGODB_URI. General good practice to be the same as SERVICE_NAME but not required
-    environment:
-      - PUID=1000                                               # Not necessary, but sets the USER who runs the container as not root
-      - PGID=1000                                               # Not necessary, but sets the USER who runs the container as not root
-      - TZ=America/Cancun                                       # Use your Time Zone from https://wikipedia.org/wiki/List_of_tz_database_time_zones
-      - MONGO_INITDB_ROOT_USERNAME=mongodbpoweruser             # May be necessry if importing from another database or doing management on the database
-      - MONGO_INITDB_DATABASE=auth                              # May be optional, hard to find documaentation about it
-      - MONGO_INITDB_ROOT_PASSWORD=mongoRootPassword03          # Will probably never be needed, I set it the same as MONGODB_ROOT_PASSWORD
-      - MONGODB_ROOT_USER=mongodbpoweruser                      # I'm not sure what the differences are but is usually set the same as MONGO_INITDB_ROOT_USERNAME
-      - MONGODB_ROOT_PASSWORD=mongoaRootPassword02              # I'm not sure what the differences are but is usually set the same as MONGO_INITDB_ROOT_PASSWORD
-      - MONGODB_USERNAME=nightscout01                           # Username called in Nightscout's MONGODB_URI - I set to just "Nightscout"
-      - MONGODB_PASSWORD=mongoPassword01                        # Password called in Nightscout's MONGODB_URI
-      - MONGODB_DATABASE=nightscout02                           # Database called in Nightscout's MONGODB_URI - I set to just "Nightscout"
-      - MONGODB_PORT_NUMBER=27017                               # DEFAULT[27017] - Port each MongoDB will use inernally 27017:<<MONGODB_PORT_NUMBER>>
-    #ports:                                                  # Only needed to access database externally. If all parts are in the same stack/network removal or # suggested
-    #  - 27017:27017                                             # DEFAULT[27017:27017] - <<EXTERNAL PORT>>:<<MONGODB_PORT_NUMBER>>
-    volumes:
-      - /docker/cgm/nightscout/database:/bitnami/mongodb        # /LOCATION/ON/YOUR/SYSTEM:/CONTAINER/LOCATION - for "mongo:latest" use ":/data/db"
-      - /docker/log/var/log:/var/log:rw                         # As of now none of these containers use it but I always map "/var/log" for system logging
-      - /etc/localtime:/etc/localtime:ro                        # Not necessary but lets the container know the system's timezone ":ro" means "Read Only"
-    restart: always                                             # Sets the container to always run
- ##################################################
-  nightscout-mongo-express:
-    image: mongo-express
-    container_name: nightscout-mongo-express
-    depends_on:
-      - nightscout-mongodb                                      # This means this container will not start until the Database Container starts
-    environment:
-      - PUID=1000                                               # Refer to {nightscout-mongodb}
-      - PGID=1000                                               # Refer to {nightscout-mongodb}
-      - TZ=America/Cancun                                       # Refer to {nightscout-mongodb}
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=mongodbpoweruser        # <<MONGODB_ROOT_USER>> in {nightscout-mongodb} - used to manage the Database
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=mongoaRootPassword02    # <<MONGODB_ROOT_PASSWORD>> in {nightscout-mongodb} - used to manage the Database
-      - ME_CONFIG_MONGODB_URL=mongodb://mongodbpoweruser:mongoaRootPassword02@nightscout-mongodb:27017/ # mongodb://<<MONGODB_ROOT_USER>>:<<MONGODB_ROOT_PASSWORD>>@<<CONTAINER_NAME>>:<<MONGODB_PORT_NUMBER>>/
-    ports:
-      - 18081:8081                                              # DEFAULT[8081:8081] - Management Port for MongoDB="http://YOUR.IP.ADD.RESS:18081" - Internally="nightscout-mongo-express:8081"
-    volumes:
-      - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-mongodb}
-      - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-mongodb}
-    restart: always                                             # Refer to {nightscout-mongodb}
- ##################################################
   nightscout-app:
     image: nightscout/cgm-remote-monitor:latest
     container_name: nightscout
     depends_on:
       - nightscout-mongodb
     environment:
-      - PUID=1000                                               # Refer to {nightscout-mongodb}
-      - PGID=1000                                               # Refer to {nightscout-mongodb}
-      - TZ=America/Cancun                                       # Refer to {nightscout-mongodb}
+      - PUID=1000                                               # Not necessary, but sets the USER who runs the container as not root
+      - PGID=1000                                               # Not necessary, but sets the USER who runs the container as not root
+      - TZ=America/Cancun                                       # Use your Time Zone from https://wikipedia.org/wiki/List_of_tz_database_time_zones
       - API_SECRET=secretAPIatLeast12Characters                 # In xDrip: REST-API > Base URL= "<<API_SECRET>>@<<BASE_URL>>/api/v1/"
       - MONGODB_URI=mongodb://nightscout01:mongoPassword01@nightscout-mongodb:27017/nightscout02
       #- HOSTNAME=0.0.0.0                                        # DEFAULT[0.0.0.0] (any)
@@ -177,7 +133,6 @@ services:
       #- MONGO_PROFILE_COLLECTION=                               # DEFAULT[profile] - Collection used to store your profiles
       #- MONGO_FOOD_COLLECTION=                                  # DEFAULT[food] - Collection used to store your food database
       #- MONGO_ACTIVITY_COLLECTION=                              # DEFAULT[activity] - Collection used to store activity data
-
     ports:
       - "1337:1337"
     volumes:
@@ -191,9 +146,71 @@ services:
       #- /docker/cgm/nightscout/audio/urgent.mp3:/opt/app/static/audio/alarm2.mp3
       #- /docker/cgm/nightscout/audio/alarm2.ogg:/opt/app/static/audio/alarm2.ogg           # As far as I know these are never used
     #  - /docker/cgm/nightscout/audio:/opt/app/static/audio
-      - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-mongodb}
-      - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-mongodb}
-    restart: always                                             # Refer to {nightscout-mongodb}
+      - /docker/log/var/log:/var/log:rw                         # As of now none of these containers use it but I always map "/var/log" for system logging
+      - /etc/localtime:/etc/localtime:ro                        # Not necessary but lets the container know the system's timezone ":ro" means "Read Only"
+    restart: always                                             # Sets the container to always run
+    healthcheck:                                                # OPTIONAL: This adds a Healthcheck to the container. Instead of just saying `[Running]` it will say `[Healthy]` if it is unhealthy it should restart. Trying to find a better test, if it says [Unhealthy] or [Starting] while working correctly this section should be #commented out
+      test: ["CMD-SHELL", "wget -q http://localhost:1337 -O - | grep 'Bolus' || (kill -s 15 1 && sleep 10 && kill -s 9 1)"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+ ##################################################
+  nightscout-mongodb:                                   # SERVICE_NAME - used by the "depends_on:" to make sure the database it running before things try to use it
+    image: bitnami/mongodb:latest                       # Other options "image: mongo:latest" will need adjustments in other places such as "volumes:" mounts
+    #image: docker.io/bitnami/mongodb:4.4                # I prefer to call "latest" & without "docker.io/" But others prefer to use them for stability assurance
+    container_name: nightscout-mongodb                  # called in Nightscout's MONGODB_URI. General good practice to be the same as SERVICE_NAME but not required
+    environment:
+      - PUID=1000                                               # Refer to {nightscout-app}
+      - PGID=1000                                               # Refer to {nightscout-app}
+      - TZ=America/Cancun                                       # Refer to {nightscout-app}
+      - MONGO_INITDB_ROOT_USERNAME=mongodbpoweruser             # May be necessry if importing from another database or doing management on the database
+      - MONGO_INITDB_DATABASE=auth                              # May be optional, hard to find documaentation about it
+      - MONGO_INITDB_ROOT_PASSWORD=mongoRootPassword03          # Will probably never be needed, I set it the same as MONGODB_ROOT_PASSWORD
+      - MONGODB_ROOT_USER=mongodbpoweruser                      # I'm not sure what the differences are but is usually set the same as MONGO_INITDB_ROOT_USERNAME
+      - MONGODB_ROOT_PASSWORD=mongoaRootPassword02              # I'm not sure what the differences are but is usually set the same as MONGO_INITDB_ROOT_PASSWORD
+      - MONGODB_USERNAME=nightscout01                           # Username called in Nightscout's MONGODB_URI - I set to just "Nightscout"
+      - MONGODB_PASSWORD=mongoPassword01                        # Password called in Nightscout's MONGODB_URI
+      - MONGODB_DATABASE=nightscout02                           # Database called in Nightscout's MONGODB_URI - I set to just "Nightscout"
+      - MONGODB_PORT_NUMBER=27017                               # DEFAULT[27017] - Port each MongoDB will use inernally 27017:<<MONGODB_PORT_NUMBER>>
+    #ports:                                                  # Only needed to access database externally. If all parts are in the same stack/network removal or # suggested
+    #  - 27017:27017                                             # DEFAULT[27017:27017] - <<EXTERNAL PORT>>:<<MONGODB_PORT_NUMBER>>
+    volumes:
+      - /docker/cgm/nightscout/database:/bitnami/mongodb        # /LOCATION/ON/YOUR/SYSTEM:/CONTAINER/LOCATION - for "mongo:latest" use ":/data/db"
+      - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-app}
+      - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-app}
+    restart: always                                             # Refer to {nightscout-app}
+    healthcheck:                                                # OPTIONAL: This adds a Healthcheck to the container. Instead of just saying `[Running]` it will say `[Healthy]` if it is unhealthy it should restart
+      test: ["CMD", "sh", "-c", "mongosh --eval 'db.runCommand(\"ping\")' || exit 1", "||", "bash", "-c", "kill -s 15 1 && sleep 10 && kill -s 9 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+ ##################################################
+  nightscout-mongo-express:
+    image: mongo-express
+    container_name: nightscout-mongo-express
+    depends_on:
+      - nightscout-mongodb                                      # This means this container will not start until the Database Container starts
+    environment:
+      - PUID=1000                                               # Refer to {nightscout-app}
+      - PGID=1000                                               # Refer to {nightscout-app}
+      - TZ=America/Cancun                                       # Refer to {nightscout-app}
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=mongodbpoweruser        # <<MONGODB_ROOT_USER>> in {nightscout-mongodb} - used to manage the Database
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=mongoaRootPassword02    # <<MONGODB_ROOT_PASSWORD>> in {nightscout-mongodb} - used to manage the Database
+      - ME_CONFIG_MONGODB_URL=mongodb://mongodbpoweruser:mongoaRootPassword02@nightscout-mongodb:27017/ # mongodb://<<MONGODB_ROOT_USER>>:<<MONGODB_ROOT_PASSWORD>>@<<CONTAINER_NAME>>:<<MONGODB_PORT_NUMBER>>/
+    ports:
+      - 18081:8081                                              # DEFAULT[8081:8081] - Management Port for MongoDB="http://YOUR.IP.ADD.RESS:18081" - Internally="nightscout-mongo-express:8081"
+    volumes:
+      - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-app}
+      - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-app}
+    restart: always                                             # Refer to {nightscout-app}
+    healthcheck:                                                # OPTIONAL: This adds a Healthcheck to the container. Instead of just saying `[Running]` it will say `[Healthy]` if it is unhealthy it will restart
+      test: ["CMD-SHELL", "wget -q http://localhost:8081 -O - | grep 'Mongo Express' || exit 1", "||", "bash", "-c", "kill -s 15 1 && sleep 10 && kill -s 9 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
 
 ```
 
@@ -208,59 +225,15 @@ version: '3.9'
 ####    All comments (Things after "# ") or unwanted lines can be removed
 ####    "/docker/cgm/nightscout/" is used in this example as the local install location. locations can be changed to suit your setup
 services:
-  nightscout-mongodb:                                   # SERVICE_NAME - used by the "depends_on:" to make sure the database it running before things try to use it
-    image: bitnami/mongodb:latest                       # Other options "image: mongo:latest" will need adjustments in other places such as "volumes:" mounts
-    #image: docker.io/bitnami/mongodb:4.4                # I prefer to call "latest" & without "docker.io/" But others prefer to use them for stability assurance
-    container_name: nightscout-mongodb                  # called in Nightscout's MONGODB_URI. General good practice to be the same as SERVICE_NAME but not required
-    environment:
-      - PUID=1000                                               # Not necessary, but sets the USER who runs the container as not root
-      - PGID=1000                                               # Not necessary, but sets the USER who runs the container as not root
-      - TZ=America/Cancun                                       # Use your Time Zone from https://wikipedia.org/wiki/List_of_tz_database_time_zones
-      - MONGO_INITDB_ROOT_USERNAME=mongodbpoweruser             # May be necessry if importing from another database or doing management on the database
-      - MONGO_INITDB_DATABASE=auth                              # May be optional, hard to find documaentation about it
-      - MONGO_INITDB_ROOT_PASSWORD=mongoRootPassword03          # Will probably never be needed, I set it the same as MONGODB_ROOT_PASSWORD
-      - MONGODB_ROOT_USER=mongodbpoweruser                      # I'm not sure what the differences are but is usually set the same as MONGO_INITDB_ROOT_USERNAME
-      - MONGODB_ROOT_PASSWORD=mongoaRootPassword02              # I'm not sure what the differences are but is usually set the same as MONGO_INITDB_ROOT_PASSWORD
-      - MONGODB_USERNAME=nightscout01                           # Username called in Nightscout's MONGODB_URI - I set to just "Nightscout"
-      - MONGODB_PASSWORD=mongoPassword01                        # Password called in Nightscout's MONGODB_URI
-      - MONGODB_DATABASE=nightscout02                           # Database called in Nightscout's MONGODB_URI - I set to just "Nightscout"
-      - MONGODB_PORT_NUMBER=27017                               # DEFAULT[27017] - Port each MongoDB will use inernally 27017:<<MONGODB_PORT_NUMBER>>
-    #ports:                                                  # Only needed to access database externally. If all parts are in the same stack/network removal or # suggested
-    #  - 27017:27017                                             # DEFAULT[27017:27017] - <<EXTERNAL PORT>>:<<MONGODB_PORT_NUMBER>>
-    volumes:
-      - /docker/cgm/nightscout/database:/bitnami/mongodb        # /LOCATION/ON/YOUR/SYSTEM:/CONTAINER/LOCATION - for "mongo:latest" use ":/data/db"
-      - /docker/log/var/log:/var/log:rw                         # As of now none of these containers use it but I always map "/var/log" for system logging
-      - /etc/localtime:/etc/localtime:ro                        # Not necessary but lets the container know the system's timezone ":ro" means "Read Only"
-    restart: always                                             # Sets the container to always run
- ##################################################
-  nightscout-mongo-express:
-    image: mongo-express
-    container_name: nightscout-mongo-express
-    depends_on:
-      - nightscout-mongodb                                      # This means this container will not start until the Database Container starts
-    environment:
-      - PUID=1000                                               # Refer to {nightscout-mongodb}
-      - PGID=1000                                               # Refer to {nightscout-mongodb}
-      - TZ=America/Cancun                                       # Refer to {nightscout-mongodb}
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=mongodbpoweruser        # <<MONGODB_ROOT_USER>> in {nightscout-mongodb} - used to manage the Database
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=mongoaRootPassword02    # <<MONGODB_ROOT_PASSWORD>> in {nightscout-mongodb} - used to manage the Database
-      - ME_CONFIG_MONGODB_URL=mongodb://mongodbpoweruser:mongoaRootPassword02@nightscout-mongodb:27017/ # mongodb://<<MONGODB_ROOT_USER>>:<<MONGODB_ROOT_PASSWORD>>@<<CONTAINER_NAME>>:<<MONGODB_PORT_NUMBER>>/
-    ports:
-      - 18081:8081                                              # DEFAULT[8081:8081] - Management Port for MongoDB="http://YOUR.IP.ADD.RESS:18081" - Internally="nightscout-mongo-express:8081"
-    volumes:
-      - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-mongodb}
-      - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-mongodb}
-    restart: always                                             # Refer to {nightscout-mongodb}
- ##################################################
   nightscout-app:
     image: nightscout/cgm-remote-monitor:latest
     container_name: nightscout
     depends_on:
       - nightscout-mongodb
     environment:
-      - PUID=1000                                               # Refer to {nightscout-mongodb}
-      - PGID=1000                                               # Refer to {nightscout-mongodb}
-      - TZ=America/Cancun                                       # Refer to {nightscout-mongodb}
+      - PUID=1000                                               # Not necessary, but sets the USER who runs the container as not root
+      - PGID=1000                                               # Not necessary, but sets the USER who runs the container as not root
+      - TZ=America/Cancun                                       # Use your Time Zone from https://wikipedia.org/wiki/List_of_tz_database_time_zones
       - API_SECRET=secretAPIatLeast12Characters                 # In xDrip: REST-API > Base URL= "<<API_SECRET>>@<<BASE_URL>>/api/v1/"
       - MONGODB_URI=mongodb://nightscout01:mongoPassword01@nightscout-mongodb:27017/nightscout02
       - INSECURE_USE_HTTP=true                                  # DEFAULT[false] - Set this to "true", unless you have your own SSL provided internally, if you wish to access without reverse Proxy
@@ -316,9 +289,71 @@ services:
       - "1337:1337"
     volumes:
       #- /docker/cgm/nightscout/audio:/opt/app/static/audio
-      - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-mongodb}
-      - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-mongodb}
-    restart: always                                             # Refer to {nightscout-mongodb}
+      - /docker/log/var/log:/var/log:rw                         # As of now none of these containers use it but I always map "/var/log" for system logging
+      - /etc/localtime:/etc/localtime:ro                        # Not necessary but lets the container know the system's timezone ":ro" means "Read Only"
+    restart: always                                             # Sets the container to always run
+    healthcheck:                                                # OPTIONAL: This adds a Healthcheck to the container. Instead of just saying `[Running]` it will say `[Healthy]` if it is unhealthy it should restart. Trying to find a better test, if it says [Unhealthy] or [Starting] while working correctly this section should be #commented out
+      test: ["CMD-SHELL", "wget -q http://localhost:1337 -O - | grep 'Bolus' || (kill -s 15 1 && sleep 10 && kill -s 9 1)"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+ ##################################################
+  nightscout-mongodb:                                   # SERVICE_NAME - used by the "depends_on:" to make sure the database it running before things try to use it
+    image: bitnami/mongodb:latest                       # Other options "image: mongo:latest" will need adjustments in other places such as "volumes:" mounts
+    #image: docker.io/bitnami/mongodb:4.4                # I prefer to call "latest" & without "docker.io/" But others prefer to use them for stability assurance
+    container_name: nightscout-mongodb                  # called in Nightscout's MONGODB_URI. General good practice to be the same as SERVICE_NAME but not required
+    environment:
+      - PUID=1000                                               # Refer to {nightscout-app}
+      - PGID=1000                                               # Refer to {nightscout-app}
+      - TZ=America/Cancun                                       # Refer to {nightscout-app}
+      - MONGO_INITDB_ROOT_USERNAME=mongodbpoweruser             # May be necessry if importing from another database or doing management on the database
+      - MONGO_INITDB_DATABASE=auth                              # May be optional, hard to find documaentation about it
+      - MONGO_INITDB_ROOT_PASSWORD=mongoRootPassword03          # Will probably never be needed, I set it the same as MONGODB_ROOT_PASSWORD
+      - MONGODB_ROOT_USER=mongodbpoweruser                      # I'm not sure what the differences are but is usually set the same as MONGO_INITDB_ROOT_USERNAME
+      - MONGODB_ROOT_PASSWORD=mongoaRootPassword02              # I'm not sure what the differences are but is usually set the same as MONGO_INITDB_ROOT_PASSWORD
+      - MONGODB_USERNAME=nightscout01                           # Username called in Nightscout's MONGODB_URI - I set to just "Nightscout"
+      - MONGODB_PASSWORD=mongoPassword01                        # Password called in Nightscout's MONGODB_URI
+      - MONGODB_DATABASE=nightscout02                           # Database called in Nightscout's MONGODB_URI - I set to just "Nightscout"
+      - MONGODB_PORT_NUMBER=27017                               # DEFAULT[27017] - Port each MongoDB will use inernally 27017:<<MONGODB_PORT_NUMBER>>
+    #ports:                                                  # Only needed to access database externally. If all parts are in the same stack/network removal or # suggested
+    #  - 27017:27017                                             # DEFAULT[27017:27017] - <<EXTERNAL PORT>>:<<MONGODB_PORT_NUMBER>>
+    volumes:
+      - /docker/cgm/nightscout/database:/bitnami/mongodb        # /LOCATION/ON/YOUR/SYSTEM:/CONTAINER/LOCATION - for "mongo:latest" use ":/data/db"
+      - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-app}
+      - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-app}
+    restart: always                                             # Refer to {nightscout-app}
+    healthcheck:                                                # OPTIONAL: This adds a Healthcheck to the container. Instead of just saying `[Running]` it will say `[Healthy]` if it is unhealthy it should restart
+      test: ["CMD", "sh", "-c", "mongosh --eval 'db.runCommand(\"ping\")' || exit 1", "||", "bash", "-c", "kill -s 15 1 && sleep 10 && kill -s 9 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+ ##################################################
+  nightscout-mongo-express:
+    image: mongo-express
+    container_name: nightscout-mongo-express
+    depends_on:
+      - nightscout-mongodb                                      # This means this container will not start until the Database Container starts
+    environment:
+      - PUID=1000                                               # Refer to {nightscout-app}
+      - PGID=1000                                               # Refer to {nightscout-app}
+      - TZ=America/Cancun                                       # Refer to {nightscout-app}
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=mongodbpoweruser        # <<MONGODB_ROOT_USER>> in {nightscout-mongodb} - used to manage the Database
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=mongoaRootPassword02    # <<MONGODB_ROOT_PASSWORD>> in {nightscout-mongodb} - used to manage the Database
+      - ME_CONFIG_MONGODB_URL=mongodb://mongodbpoweruser:mongoaRootPassword02@nightscout-mongodb:27017/ # mongodb://<<MONGODB_ROOT_USER>>:<<MONGODB_ROOT_PASSWORD>>@<<CONTAINER_NAME>>:<<MONGODB_PORT_NUMBER>>/
+    ports:
+      - 18081:8081                                              # DEFAULT[8081:8081] - Management Port for MongoDB="http://YOUR.IP.ADD.RESS:18081" - Internally="nightscout-mongo-express:8081"
+    volumes:
+      - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-app}
+      - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-app}
+    restart: always                                             # Refer to {nightscout-app}
+    healthcheck:                                                # OPTIONAL: This adds a Healthcheck to the container. Instead of just saying `[Running]` it will say `[Healthy]` if it is unhealthy it will restart
+      test: ["CMD-SHELL", "wget -q http://localhost:8081 -O - | grep 'Mongo Express' || exit 1", "||", "bash", "-c", "kill -s 15 1 && sleep 10 && kill -s 9 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
 
 ```
 
@@ -333,59 +368,15 @@ version: '3.9'
 ####    All comments (Things after "# ") or unwanted lines can be removed
 ####    "/docker/cgm/nightscout/" is used in this example as the local install location. locations can be changed to suit your setup
 services:
-  nightscout-mongodb:                                   # SERVICE_NAME - used by the "depends_on:" to make sure the database it running before things try to use it
-    image: bitnami/mongodb:latest                       # Other options "image: mongo:latest" will need adjustments in other places such as "volumes:" mounts
-    #image: docker.io/bitnami/mongodb:4.4                # I prefer to call "latest" & without "docker.io/" But others prefer to use them for stability assurance
-    container_name: nightscout-mongodb                  # called in Nightscout's MONGODB_URI. General good practice to be the same as SERVICE_NAME but not required
-    environment:
-      - PUID=1000                                               # Not necessary, but sets the USER who runs the container as not root
-      - PGID=1000                                               # Not necessary, but sets the USER who runs the container as not root
-      - TZ=America/Cancun                                       # Use your Time Zone from https://wikipedia.org/wiki/List_of_tz_database_time_zones
-      - MONGO_INITDB_ROOT_USERNAME=mongodbpoweruser             # May be necessry if importing from another database or doing management on the database
-      - MONGO_INITDB_DATABASE=auth                              # May be optional, hard to find documaentation about it
-      - MONGO_INITDB_ROOT_PASSWORD=mongoRootPassword03          # Will probably never be needed, I set it the same as MONGODB_ROOT_PASSWORD
-      - MONGODB_ROOT_USER=mongodbpoweruser                      # I'm not sure what the differences are but is usually set the same as MONGO_INITDB_ROOT_USERNAME
-      - MONGODB_ROOT_PASSWORD=mongoaRootPassword02              # I'm not sure what the differences are but is usually set the same as MONGO_INITDB_ROOT_PASSWORD
-      - MONGODB_USERNAME=nightscout01                           # Username called in Nightscout's MONGODB_URI - I set to just "Nightscout"
-      - MONGODB_PASSWORD=mongoPassword01                        # Password called in Nightscout's MONGODB_URI
-      - MONGODB_DATABASE=nightscout02                           # Database called in Nightscout's MONGODB_URI - I set to just "Nightscout"
-      - MONGODB_PORT_NUMBER=27017                               # DEFAULT[27017] - Port each MongoDB will use inernally 27017:<<MONGODB_PORT_NUMBER>>
-    #ports:                                                  # Only needed to access database externally. If all parts are in the same stack/network removal or # suggested
-    #  - 27017:27017                                             # DEFAULT[27017:27017] - <<EXTERNAL PORT>>:<<MONGODB_PORT_NUMBER>>
-    volumes:
-      - /docker/cgm/nightscout/database:/bitnami/mongodb        # /LOCATION/ON/YOUR/SYSTEM:/CONTAINER/LOCATION - for "mongo:latest" use ":/data/db"
-      - /docker/log/var/log:/var/log:rw                         # As of now none of these containers use it but I always map "/var/log" for system logging
-      - /etc/localtime:/etc/localtime:ro                        # Not necessary but lets the container know the system's timezone ":ro" means "Read Only"
-    restart: always                                             # Sets the container to always run
- ##################################################
-  nightscout-mongo-express:
-    image: mongo-express
-    container_name: nightscout-mongo-express
-    depends_on:
-      - nightscout-mongodb                                      # This means this container will not start until the Database Container starts
-    environment:
-      - PUID=1000                                               # Refer to {nightscout-mongodb}
-      - PGID=1000                                               # Refer to {nightscout-mongodb}
-      - TZ=America/Cancun                                       # Refer to {nightscout-mongodb}
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=mongodbpoweruser        # <<MONGODB_ROOT_USER>> in {nightscout-mongodb} - used to manage the Database
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=mongoaRootPassword02    # <<MONGODB_ROOT_PASSWORD>> in {nightscout-mongodb} - used to manage the Database
-      - ME_CONFIG_MONGODB_URL=mongodb://mongodbpoweruser:mongoaRootPassword02@nightscout-mongodb:27017/ # mongodb://<<MONGODB_ROOT_USER>>:<<MONGODB_ROOT_PASSWORD>>@<<CONTAINER_NAME>>:<<MONGODB_PORT_NUMBER>>/
-    ports:
-      - 18081:8081                                              # DEFAULT[8081:8081] - Management Port for MongoDB="http://YOUR.IP.ADD.RESS:18081" - Internally="nightscout-mongo-express:8081"
-    volumes:
-      - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-mongodb}
-      - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-mongodb}
-    restart: always                                             # Refer to {nightscout-mongodb}
- ##################################################
   nightscout-app:
     image: nightscout/cgm-remote-monitor:latest
     container_name: nightscout
     depends_on:
       - nightscout-mongodb
     environment:
-      - PUID=1000                                               # Refer to {nightscout-mongodb}
-      - PGID=1000                                               # Refer to {nightscout-mongodb}
-      - TZ=America/Cancun                                       # Refer to {nightscout-mongodb}
+      - PUID=1000                                               # Not necessary, but sets the USER who runs the container as not root
+      - PGID=1000                                               # Not necessary, but sets the USER who runs the container as not root
+      - TZ=America/Cancun                                       # Use your Time Zone from https://wikipedia.org/wiki/List_of_tz_database_time_zones
       - API_SECRET=secretAPIatLeast12Characters                 # In xDrip: REST-API > Base URL= "<<API_SECRET>>@<<BASE_URL>>/api/v1/"
       - MONGODB_URI=mongodb://nightscout01:mongoPassword01@nightscout-mongodb:27017/nightscout02
       #- HOSTNAME=0.0.0.0                                        # DEFAULT[0.0.0.0] (any)
@@ -438,9 +429,71 @@ services:
       - "1337:1337"
     volumes:
       #- /docker/cgm/nightscout/audio:/opt/app/static/audio
-      - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-mongodb}
-      - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-mongodb}
-    restart: always                                             # Refer to {nightscout-mongodb}
+      - /docker/log/var/log:/var/log:rw                         # As of now none of these containers use it but I always map "/var/log" for system logging
+      - /etc/localtime:/etc/localtime:ro                        # Not necessary but lets the container know the system's timezone ":ro" means "Read Only"
+    restart: always                                             # Sets the container to always run
+    healthcheck:                                                # OPTIONAL: This adds a Healthcheck to the container. Instead of just saying `[Running]` it will say `[Healthy]` if it is unhealthy it should restart. Trying to find a better test, if it says [Unhealthy] or [Starting] while working correctly this section should be #commented out
+      test: ["CMD-SHELL", "wget -q http://localhost:1337 -O - | grep 'Bolus' || (kill -s 15 1 && sleep 10 && kill -s 9 1)"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+ ##################################################
+  nightscout-mongodb:                                   # SERVICE_NAME - used by the "depends_on:" to make sure the database it running before things try to use it
+    image: bitnami/mongodb:latest                       # Other options "image: mongo:latest" will need adjustments in other places such as "volumes:" mounts
+    #image: docker.io/bitnami/mongodb:4.4                # I prefer to call "latest" & without "docker.io/" But others prefer to use them for stability assurance
+    container_name: nightscout-mongodb                  # called in Nightscout's MONGODB_URI. General good practice to be the same as SERVICE_NAME but not required
+    environment:
+      - PUID=1000                                               # Refer to {nightscout-app}
+      - PGID=1000                                               # Refer to {nightscout-app}
+      - TZ=America/Cancun                                       # Refer to {nightscout-app}
+      - MONGO_INITDB_ROOT_USERNAME=mongodbpoweruser             # May be necessry if importing from another database or doing management on the database
+      - MONGO_INITDB_DATABASE=auth                              # May be optional, hard to find documaentation about it
+      - MONGO_INITDB_ROOT_PASSWORD=mongoRootPassword03          # Will probably never be needed, I set it the same as MONGODB_ROOT_PASSWORD
+      - MONGODB_ROOT_USER=mongodbpoweruser                      # I'm not sure what the differences are but is usually set the same as MONGO_INITDB_ROOT_USERNAME
+      - MONGODB_ROOT_PASSWORD=mongoaRootPassword02              # I'm not sure what the differences are but is usually set the same as MONGO_INITDB_ROOT_PASSWORD
+      - MONGODB_USERNAME=nightscout01                           # Username called in Nightscout's MONGODB_URI - I set to just "Nightscout"
+      - MONGODB_PASSWORD=mongoPassword01                        # Password called in Nightscout's MONGODB_URI
+      - MONGODB_DATABASE=nightscout02                           # Database called in Nightscout's MONGODB_URI - I set to just "Nightscout"
+      - MONGODB_PORT_NUMBER=27017                               # DEFAULT[27017] - Port each MongoDB will use inernally 27017:<<MONGODB_PORT_NUMBER>>
+    #ports:                                                  # Only needed to access database externally. If all parts are in the same stack/network removal or # suggested
+    #  - 27017:27017                                             # DEFAULT[27017:27017] - <<EXTERNAL PORT>>:<<MONGODB_PORT_NUMBER>>
+    volumes:
+      - /docker/cgm/nightscout/database:/bitnami/mongodb        # /LOCATION/ON/YOUR/SYSTEM:/CONTAINER/LOCATION - for "mongo:latest" use ":/data/db"
+      - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-app}
+      - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-app}
+    restart: always                                             # Refer to {nightscout-app}
+    healthcheck:                                                # OPTIONAL: This adds a Healthcheck to the container. Instead of just saying `[Running]` it will say `[Healthy]` if it is unhealthy it should restart
+      test: ["CMD", "sh", "-c", "mongosh --eval 'db.runCommand(\"ping\")' || exit 1", "||", "bash", "-c", "kill -s 15 1 && sleep 10 && kill -s 9 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+ ##################################################
+  nightscout-mongo-express:
+    image: mongo-express
+    container_name: nightscout-mongo-express
+    depends_on:
+      - nightscout-mongodb                                      # This means this container will not start until the Database Container starts
+    environment:
+      - PUID=1000                                               # Refer to {nightscout-app}
+      - PGID=1000                                               # Refer to {nightscout-app}
+      - TZ=America/Cancun                                       # Refer to {nightscout-app}
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=mongodbpoweruser        # <<MONGODB_ROOT_USER>> in {nightscout-mongodb} - used to manage the Database
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=mongoaRootPassword02    # <<MONGODB_ROOT_PASSWORD>> in {nightscout-mongodb} - used to manage the Database
+      - ME_CONFIG_MONGODB_URL=mongodb://mongodbpoweruser:mongoaRootPassword02@nightscout-mongodb:27017/ # mongodb://<<MONGODB_ROOT_USER>>:<<MONGODB_ROOT_PASSWORD>>@<<CONTAINER_NAME>>:<<MONGODB_PORT_NUMBER>>/
+    ports:
+      - 8081:8081                                              # DEFAULT[8081:8081] - Management Port for MongoDB="http://YOUR.IP.ADD.RESS:18081" - Internally="nightscout-mongo-express:8081"
+    volumes:
+      - /docker/log/var/log:/var/log:rw                         # Refer to {nightscout-app}
+      - /etc/localtime:/etc/localtime:ro                        # Refer to {nightscout-app}
+    restart: always                                             # Refer to {nightscout-app}
+    healthcheck:                                                # OPTIONAL: This adds a Healthcheck to the container. Instead of just saying `[Running]` it will say `[Healthy]` if it is unhealthy it will restart
+      test: ["CMD-SHELL", "wget -q http://localhost:8081 -O - | grep 'Mongo Express' || exit 1", "||", "bash", "-c", "kill -s 15 1 && sleep 10 && kill -s 9 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
 
 ```
 

@@ -109,7 +109,7 @@ services:
             # xDrip
       #- API_SECRET=secretAPIatLeast12Characters                 # In xDrip got {Settings} > {Cloud Upload} > {Nightscout Sync (REST-API)}
       #- BASE_URL=https://me.xdrip.ext                           # {Enabled}=ON, {Base URL}= "<<API_SECRET>>@<<BASE_URL>>/api/v1/"
-      #- ENABLE=“careport basal bridge”
+      #- ENABLE=“careport basal bridge”                          # e.g. secretAPIatLeast12Characters@https://me.xdrip.ext/api/v1/
     ############
             # Dexcom
       #- BRIDGE_SERVER=US                                        # DEFAULT[US] - CHOICES: "US" | "EU"
